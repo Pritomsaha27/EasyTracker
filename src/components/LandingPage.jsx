@@ -16,18 +16,21 @@ function LandingPage() {
   const { state, dispatch } = useUser();
 
   const handleAddTitle = (amount, type) => {
-    setTitle([...title, { text: titleText, amount, type }]);
-    setTitleText("");
+    const newHistoryItem = { text: titleText, amount, type };
+    const updatedHistory = [...state.history, newHistoryItem]; 
+     setTitleText("");
+    dispatch({ type: "UPDATE_HISTORY", payload: updatedHistory });
   };
-
+  
   const handleTitleInput = (e) => {
     setTitleText(e.target.value);
   };
 
   const handleRemoveTitle = (index) => {
-    const updatedTitles = title.filter((_, i) => i !== index);
-    setTitle(updatedTitles);
+    const updatedHistory = state.history.filter((_, i) => i !== index);
+    dispatch({ type: "UPDATE_HISTORY", payload: updatedHistory });
   };
+  
 
   const handleAddBalanceClick = () => {
     setAddBalanceVisible(true);
@@ -101,28 +104,27 @@ function LandingPage() {
               History
             </p>
             <div>
-              {title.map((item, i) => (
-                <div
-                  key={i}
-                  className={`flex justify-between border border-r-8 p-2 drop-shadow-lg items-center mb-2 ${item.type === "income" ? "border-green-500" : "border-red-500"
-                    }`}
-                >
-                  <p className="flex-1">{item.text}</p>
-                  <p
-                    className={`flex-1 text-right ${item.type === "income" ? "text-green-500" : "text-red-600"
-                      }`}
-                  >
-                    {item.type === "income" ? `+${item.amount}` : `-${item.amount}`}
-                  </p>
-                  <button
-                    onClick={() => handleRemoveTitle(i)}
-                    className="text-lg hover:text-red-700 ml-2"
-                  >
-                    <MdDeleteForever />
-                  </button>
-                </div>
-              ))}
-            </div>
+  {state.history.map((item, i) => (
+    <div
+      key={i}
+      className={`flex justify-between border border-r-8 p-2 drop-shadow-lg items-center mb-2 ${item.type === "income" ? "border-green-500" : "border-red-500"}`}
+    >
+      <p className="flex-1">{item.text}</p>
+      <p
+        className={`flex-1 text-right ${item.type === "income" ? "text-green-500" : "text-red-600"}`}
+      >
+        {item.type === "income" ? `+${item.amount}` : `-${item.amount}`}
+      </p>
+      <button
+        onClick={() => handleRemoveTitle(i)}
+        className="text-lg hover:text-red-700 ml-2"
+      >
+        <MdDeleteForever />
+      </button>
+    </div>
+  ))}
+</div>
+
             <p className="font-semibold text-xl border-b border-black my-3">
               Add New Transaction
             </p>
