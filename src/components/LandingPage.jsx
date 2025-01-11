@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import { useUser } from "../context/UserContext"; 
+import Modal from "./Modal"
 
 function LandingPage() {
 const [balance ,setBalance] = useState(0)
@@ -10,6 +12,12 @@ const [addExpenseVisible, setAddExpenseVisible] = useState(false);
 const [activeButton, setActiveButton] = useState("balance"); 
 const [addValue, setAddValue] = useState(); 
 const [removeValue, setRemoveValue] = useState();
+const { state, dispatch } = useUser();
+const [modalOpen, setModalOpen] = useState(false);
+
+const handleLogout = () => {
+  dispatch({ type: "LOGOUT" });
+};
 const handleAddBalanceClick = () => {
     setAddBalanceVisible(true);
     setAddExpenseVisible(false);
@@ -36,6 +44,7 @@ const handleAddBalanceClick = () => {
   }
   return (
     <>
+    <p className='text-right px-20 mt-5 font-medium'>Welcome, {state.loggedIn ? state.name : "Guest"}!</p>
    <div id="form" className="flex justify-center flex-col items-center mt-20">
         <div className="w-96">
           <p className="text-center font-semibold mb-10 text-3xl">
@@ -113,9 +122,26 @@ const handleAddBalanceClick = () => {
             <button onClick={addBalanceVisible ?handleAddbalance:handleRemovebalance} className="bg-purple-500 w-full text-lg text-white font-semibold">
               Add Transaction
             </button>
+
+            {state.loggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 w-full text-lg text-white font-semibold mt-1"
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={() => setModalOpen(true)}
+                className="bg-cyan-500 w-full text-lg text-white font-semibold mt-1"
+              >
+                Please Login Here
+              </button>
+            )}
           </div>
         </div>
       </div>
+      {modalOpen && <Modal onClose={() => setModalOpen(false)} />}
     </>
   )
 }
