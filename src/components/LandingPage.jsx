@@ -1,58 +1,66 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from "react";
 import { useUser } from "../context/UserContext"; 
-import Modal from "./Modal"
+import Modal from "./Modal";
 
 function LandingPage() {
-const [balance ,setBalance] = useState(0)
-const [income , setIncome] = useState(0)
-const [expense , setExpense] = useState(0)
-const [history , setHistory] = useState("hi")
-const [addBalanceVisible, setAddBalanceVisible] = useState(true); 
-const [addExpenseVisible, setAddExpenseVisible] = useState(false);
-const [activeButton, setActiveButton] = useState("balance"); 
-const [addValue, setAddValue] = useState(); 
-const [removeValue, setRemoveValue] = useState();
-const { state, dispatch } = useUser();
-const [modalOpen, setModalOpen] = useState(false);
+  const [addBalanceVisible, setAddBalanceVisible] = useState(true);
+  const [addExpenseVisible, setAddExpenseVisible] = useState(false);
+  const [activeButton, setActiveButton] = useState("balance");
+  const [addValue, setAddValue] = useState(0);
+  const [removeValue, setRemoveValue] = useState(0);
+  const [isModalOpen, setModalOpen] = useState(false);
 
-const handleLogout = () => {
-  dispatch({ type: "LOGOUT" });
-};
-const handleAddBalanceClick = () => {
+  const { state, dispatch } = useUser();
+
+  const handleAddBalanceClick = () => {
     setAddBalanceVisible(true);
     setAddExpenseVisible(false);
     setActiveButton("balance");
-    setRemoveValue(0)
+    setRemoveValue(0);
   };
 
   const handleAddExpenseClick = () => {
     setAddBalanceVisible(false);
     setAddExpenseVisible(true);
     setActiveButton("expense");
-    setAddValue(0)
+    setAddValue(0);
   };
 
-  const handleAddbalance = () => {
-    setBalance(balance+Number(addValue))
-    setIncome(income+Number(addValue))
-    setAddValue(0)
-  }
-  const handleRemovebalance = () => {
-    setBalance(balance-Number(removeValue))
-    setExpense(expense+Number(removeValue))
-    setRemoveValue(0)
-  }
+  const handleAddBalance = () => {
+    const updatedBalance = state.balance + Number(addValue);
+    const updatedIncome = state.income + Number(addValue);
+    dispatch({ type: "UPDATE_BALANCE", payload: { balance: updatedBalance } });
+    dispatch({ type: "UPDATE_INCOME", payload: { income: updatedIncome } });
+    setAddValue(0);
+  };
+
+  const handleRemoveBalance = () => {
+    const updatedBalance = state.balance - Number(removeValue);
+    const updatedExpense = state.expense + Number(removeValue);
+    dispatch({ type: "UPDATE_BALANCE", payload: { balance: updatedBalance } });
+    dispatch({ type: "UPDATE_EXPENSE", payload: { expense: updatedExpense } });
+    setRemoveValue(0);
+  };
+
+  const handleLogout = () => {
+    dispatch({ type: "LOGOUT" });
+    localStorage.clear();
+  };
+
   return (
     <>
-    <p className='text-right px-20 mt-5 font-medium'>Welcome, {state.loggedIn ? state.name : "Guest"}!</p>
-   <div id="form" className="flex justify-center flex-col items-center mt-20">
+      <p className="text-right px-20 mt-5 font-medium">
+        Welcome, {state.loggedIn ? state.name : "Guest"}!
+      </p>
+
+      <div id="form" className="flex justify-center flex-col items-center mt-20">
         <div className="w-96">
           <p className="text-center font-semibold mb-10 text-3xl">
             Expense Tracker
           </p>
           <div>
             <p className="font-medium">YOUR BALANCE</p>
-            <p className="font-semibold text-3xl">₹{balance}.00</p>
+            <p className="font-semibold text-3xl">₹{state.balance}.00</p>
             <div
               id="expenseTab"
               className="flex my-5 text-center border py-5 drop-shadow bg-slate-50 justify-around"
@@ -60,29 +68,19 @@ const handleAddBalanceClick = () => {
               <div>
                 <p className="font-medium">INCOME</p>
                 <p className="text-2xl font-medium text-green-500">
-                  ₹{income}.00
+                  ₹{state.income}.00
                 </p>
               </div>
               <div>
                 <p className="font-medium">EXPENSE</p>
                 <p className="text-2xl font-medium text-red-600">
-                  ₹{expense}.00
+                  ₹{state.expense}.00
                 </p>
               </div>
             </div>
             <p className="font-semibold text-xl border-b border-black my-6">
-              History
-            </p>
-            <p>{history}</p>
-            <p className="font-semibold text-xl border-b border-black my-6">
               Add New Transaction
             </p>
-            <p className="font-medium">Transaction Title</p>
-            <input
-              type="text"
-              placeholder="Enter Here"
-              className="w-full border mb-2"
-            />
             <div className="flex justify-around">
               <button
                 onClick={handleAddBalanceClick}
@@ -119,10 +117,12 @@ const handleAddBalanceClick = () => {
                 addExpenseVisible ? "" : "hidden"
               }`}
             />
-            <button onClick={addBalanceVisible ?handleAddbalance:handleRemovebalance} className="bg-purple-500 w-full text-lg text-white font-semibold">
+            <button
+              onClick={addBalanceVisible ? handleAddBalance : handleRemoveBalance}
+              className="bg-purple-500 w-full text-lg text-white font-semibold"
+            >
               Add Transaction
             </button>
-
             {state.loggedIn ? (
               <button
                 onClick={handleLogout}
@@ -141,9 +141,10 @@ const handleAddBalanceClick = () => {
           </div>
         </div>
       </div>
-      {modalOpen && <Modal onClose={() => setModalOpen(false)} />}
+
+      {isModalOpen && <Modal onClose={() => setModalOpen(false)} />}
     </>
-  )
+  );
 }
 
-export default LandingPage
+export default LandingPage;
