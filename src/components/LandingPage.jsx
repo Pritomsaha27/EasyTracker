@@ -79,8 +79,13 @@ function LandingPage() {
               </div>
             </div>
             <p className="font-semibold text-xl border-b border-black my-6">
+              History
+            </p>
+            <p className="font-semibold text-xl border-b border-black my-3">
               Add New Transaction
             </p>
+            <p className='font-medium'>Transaction Title</p>
+            <input type="text " placeholder='Enter Here' className='w-full border mb-4' />
             <div className="flex justify-around">
               <button
                 onClick={handleAddBalanceClick}
