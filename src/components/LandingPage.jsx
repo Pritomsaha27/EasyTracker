@@ -5,24 +5,35 @@ const [balance ,setBalance] = useState(0)
 const [income , setIncome] = useState(0)
 const [expense , setExpense] = useState(0)
 const [history , setHistory] = useState("hi")
-const [addBalance , setAddBalance] = useState(0)
-const [addExpense , setAddExpenses] = useState(0)
 const [addBalanceVisible, setAddBalanceVisible] = useState(true); 
 const [addExpenseVisible, setAddExpenseVisible] = useState(false);
 const [activeButton, setActiveButton] = useState("balance"); 
-
+const [addValue, setAddValue] = useState(); 
+const [removeValue, setRemoveValue] = useState();
 const handleAddBalanceClick = () => {
     setAddBalanceVisible(true);
     setAddExpenseVisible(false);
     setActiveButton("balance");
+    setRemoveValue(0)
   };
 
   const handleAddExpenseClick = () => {
     setAddBalanceVisible(false);
     setAddExpenseVisible(true);
     setActiveButton("expense");
+    setAddValue(0)
   };
 
+  const handleAddbalance = () => {
+    setBalance(balance+Number(addValue))
+    setIncome(income+Number(addValue))
+    setAddValue(0)
+  }
+  const handleRemovebalance = () => {
+    setBalance(balance-Number(removeValue))
+    setExpense(expense+Number(removeValue))
+    setRemoveValue(0)
+  }
   return (
     <>
    <div id="form" className="flex justify-center flex-col items-center mt-20">
@@ -83,6 +94,8 @@ const handleAddBalanceClick = () => {
             </div>
             <input
               type="number"
+              value={addValue}
+              onChange={(e) => setAddValue(e.target.value)}
               placeholder="Add Balance"
               className={`w-full border mb-2 ${
                 addBalanceVisible ? "" : "hidden"
@@ -90,12 +103,14 @@ const handleAddBalanceClick = () => {
             />
             <input
               type="number"
+              value={removeValue}
+              onChange={(e) => setRemoveValue(e.target.value)}
               placeholder="Add Expense"
               className={`w-full border mb-2 ${
                 addExpenseVisible ? "" : "hidden"
               }`}
             />
-            <button className="bg-purple-500 w-full text-lg text-white font-semibold">
+            <button onClick={addBalanceVisible ?handleAddbalance:handleRemovebalance} className="bg-purple-500 w-full text-lg text-white font-semibold">
               Add Transaction
             </button>
           </div>
