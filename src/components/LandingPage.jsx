@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useUser } from "../context/UserContext"; 
+import { useUser } from "../context/UserContext";
 import Modal from "./Modal";
+import { MdDeleteForever } from "react-icons/md";
 
 function LandingPage() {
   const [addBalanceVisible, setAddBalanceVisible] = useState(true);
@@ -9,8 +10,24 @@ function LandingPage() {
   const [addValue, setAddValue] = useState(0);
   const [removeValue, setRemoveValue] = useState(0);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [title, setTitle] = useState([])
+  const [titleText, setTitleText] = useState("");
 
   const { state, dispatch } = useUser();
+
+  const handleAddTitle = (amount, type) => {
+    setTitle([...title, { text: titleText, amount, type }]);
+    setTitleText("");
+  };
+
+  const handleTitleInput = (e) => {
+    setTitleText(e.target.value);
+  };
+
+  const handleRemoveTitle = (index) => {
+    const updatedTitles = title.filter((_, i) => i !== index);
+    setTitle(updatedTitles);
+  };
 
   const handleAddBalanceClick = () => {
     setAddBalanceVisible(true);
@@ -27,6 +44,7 @@ function LandingPage() {
   };
 
   const handleAddBalance = () => {
+    handleAddTitle(Number(addValue), 'income');
     const updatedBalance = state.balance + Number(addValue);
     const updatedIncome = state.income + Number(addValue);
     dispatch({ type: "UPDATE_BALANCE", payload: { balance: updatedBalance } });
@@ -35,6 +53,7 @@ function LandingPage() {
   };
 
   const handleRemoveBalance = () => {
+    handleAddTitle(Number(removeValue), 'expense');
     const updatedBalance = state.balance - Number(removeValue);
     const updatedExpense = state.expense + Number(removeValue);
     dispatch({ type: "UPDATE_BALANCE", payload: { balance: updatedBalance } });
@@ -81,25 +100,50 @@ function LandingPage() {
             <p className="font-semibold text-xl border-b border-black my-6">
               History
             </p>
+            <div>
+              {title.map((item, i) => (
+                <div
+                  key={i}
+                  className={`flex justify-between border border-r-8 p-2 drop-shadow-lg items-center mb-2 ${item.type === "income" ? "border-green-500" : "border-red-500"
+                    }`}
+                >
+                  <p className="flex-1">{item.text}</p>
+                  <p
+                    className={`flex-1 text-right ${item.type === "income" ? "text-green-500" : "text-red-600"
+                      }`}
+                  >
+                    {item.type === "income" ? `+${item.amount}` : `-${item.amount}`}
+                  </p>
+                  <button
+                    onClick={() => handleRemoveTitle(i)}
+                    className="text-lg hover:text-red-700 ml-2"
+                  >
+                    <MdDeleteForever />
+                  </button>
+                </div>
+              ))}
+            </div>
             <p className="font-semibold text-xl border-b border-black my-3">
               Add New Transaction
             </p>
             <p className='font-medium'>Transaction Title</p>
-            <input type="text " placeholder='Enter Here' className='w-full border mb-4' />
+            <input
+              type="text"
+              value={titleText}
+              onChange={handleTitleInput}
+              placeholder='Enter Here'
+              className='w-full hover:shadow hover:border-slate-800 border mb-4'
+            />
             <div className="flex justify-around">
               <button
                 onClick={handleAddBalanceClick}
-                className={`font-medium w-1/2 ${
-                  activeButton === "balance" ? "" : "text-slate-300"
-                }`}
+                className={`font-medium w-1/2 ${activeButton === "balance" ? "" : "text-slate-300"}`}
               >
                 Add Balance
               </button>
               <button
                 onClick={handleAddExpenseClick}
-                className={`font-medium w-1/2 ${
-                  activeButton === "expense" ? "" : "text-slate-300"
-                }`}
+                className={`font-medium w-1/2 ${activeButton === "expense" ? "" : "text-slate-300"}`}
               >
                 Add Expense
               </button>
@@ -109,36 +153,32 @@ function LandingPage() {
               value={addValue}
               onChange={(e) => setAddValue(e.target.value)}
               placeholder="Add Balance"
-              className={`w-full border mb-2 ${
-                addBalanceVisible ? "" : "hidden"
-              }`}
+              className={`w-full border mb-2  hover:shadow hover:border-slate-800 ${addBalanceVisible ? "" : "hidden"}`}
             />
             <input
               type="number"
               value={removeValue}
               onChange={(e) => setRemoveValue(e.target.value)}
               placeholder="Add Expense"
-              className={`w-full border mb-2 ${
-                addExpenseVisible ? "" : "hidden"
-              }`}
+              className={`w-full border hover:border-slate-800 mb-2 ${addExpenseVisible ? "" : "hidden"}`}
             />
             <button
               onClick={addBalanceVisible ? handleAddBalance : handleRemoveBalance}
-              className="bg-purple-500 w-full text-lg text-white font-semibold"
+              className="bg-purple-500 hover:text-xl hover:bg-purple-600 transition-all duration-350 w-full text-lg text-white font-semibold"
             >
               Add Transaction
             </button>
             {state.loggedIn ? (
               <button
                 onClick={handleLogout}
-                className="bg-red-500 w-full text-lg text-white font-semibold mt-1"
+                className="bg-red-500 hover:text-xl hover:bg-red-600 transition-all duration-350 w-full text-lg text-white font-semibold mt-1"
               >
                 Logout
               </button>
             ) : (
               <button
                 onClick={() => setModalOpen(true)}
-                className="bg-cyan-500 w-full text-lg text-white font-semibold mt-1"
+                className="bg-cyan-500 hover:bg-cyan-600 hover:text-xl transition-all duration-350  w-full text-lg text-white font-semibold mt-1"
               >
                 Please Login Here
               </button>
